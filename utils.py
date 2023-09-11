@@ -5,6 +5,20 @@ import torch
 from data import *
 
 
+def plot_img(ax, path):
+    ax.imshow(np.array(Image.open(path)))
+    ax.axis('off')
+    
+    
+def plot_dataset(df):
+    plt.figure(figsize=(4,4))
+    rand_idxs = np.random.randint(1, len(df), 3)
+    paths = df.path.iloc[rand_idxs].values
+    for idx, path in enumerate(paths):
+        ax = plt.subplot(1, 3, idx+1)
+        plot_img(ax, path)
+
+        
 def get_valid_results(model, dl, num_samples=8):
     batch = next(iter(dl))
     output = model(batch[0].cuda()).detach().cpu()
@@ -33,7 +47,7 @@ def plt_subs(og_imgs, gen_imgs, size=3):
     fig.subplots_adjust(top=0.5)
     
 
-def get_random_latent_vals(min=-50, max=100, rows=6, cols=2):
+def get_random_latent_vals(min=-30, max=30, rows=6, cols=2):
     return min + (max - min) * np.random.rand(rows, cols)
 
 
@@ -55,18 +69,18 @@ def get_encoded(model, train_df=False, shuffle=True):
     return embeds, lbls
 
 
-def get_decoded(model, latents=None, min=-100, max=100, rows=3, cols=2):
+def get_decoded(model, latents=None, min=-30, max=30, rows=3, cols=2):
     if latents is None: 
         latents = get_random_latent_vals(min=min, max=max, rows=rows, cols=cols)
     imgs = torch.stack([get_regen(model, *pt).squeeze(0) for pt in latents])
     return imgs, latents
 
 
-def plot_latent_regen(model, latents=None):
+def plot_latent_regen(model, latents=None, min=-30, max=30):
     model.to('cpu');
     # lets get our necessary items
     embeds, lbls = get_encoded(model)
-    regens, latents = get_decoded(model, latents=latents)
+    regens, latents = get_decoded(model, latents=latents, min=min, max=max)
 
     fig = plt.figure(figsize=(12, 6))
     

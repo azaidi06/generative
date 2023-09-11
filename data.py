@@ -8,8 +8,8 @@ import torch
 
 def get_mnist_df(train=True):
     if train is True: 
-        path = Path('data/mnist_png/training/')
-    else: path = Path('data/mnist_png/testing/')
+        path = Path('../data/mnist_png/training/')
+    else: path = Path('../data/mnist_png/testing/')
     
     data = {idx:parent_dir.ls() for idx, parent_dir in enumerate(path.ls())}
     df = [pd.DataFrame(list(data[e]), columns=['path']) for e in data]
