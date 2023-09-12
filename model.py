@@ -1,3 +1,4 @@
+from fastai.vision.all import *
 import torch
 
 def get_encoder():
@@ -46,3 +47,10 @@ class Autoencoder(torch.nn.Module):
     def decode(self, x):
         x = self.decoder(x)
         return x
+
+
+def get_learner(dls, model, device):
+    if device == 'cuda':
+        return Learner(dls, model, loss_func=MSELossFlat(), ).to_fp16()
+    else: 
+        return Learner(dls, model, loss_func=MSELossFlat())

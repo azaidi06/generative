@@ -10,18 +10,20 @@ def plot_img(ax, path):
     ax.axis('off')
     
     
-def plot_dataset(df):
+def plot_dataset(df, num_samples=6):
     plt.figure(figsize=(4,4))
-    rand_idxs = np.random.randint(1, len(df), 3)
+    if num_samples > 6: num_samples=6
+    rand_idxs = np.random.randint(1, len(df), num_samples)
     paths = df.path.iloc[rand_idxs].values
     for idx, path in enumerate(paths):
-        ax = plt.subplot(1, 3, idx+1)
+        ax = plt.subplot(1, num_samples, idx+1)
         plot_img(ax, path)
 
         
 def get_valid_results(model, dl, num_samples=8):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch = next(iter(dl))
-    output = model(batch[0].cuda()).detach().cpu()
+    output = model(batch[0].to(device)).detach().cpu()
     return batch[0][:num_samples].cpu(), output[:num_samples]
 
 
