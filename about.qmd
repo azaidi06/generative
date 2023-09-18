@@ -1,0 +1,7 @@
+---
+title: "About"
+---
+
+Random forays into generative modeling. Starting with basic models/items like autoencoders and slowly making the way up to more complex things like stable diffusion(?)
+
+For the most part everything will be done with Pytorch/FastAI

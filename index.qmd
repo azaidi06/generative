@@ -1,0 +1,12 @@
+---
+title: "Exploring the world of generative modeling"
+---
+
+* First we'll start off with a something simple [Autoencoder](autoencoder.ipynb)
+    + An exploration on dataset requirements -- [How much data do we need?!]()
+* We'll then we'll make it even more robust: [Variational Autoencoders]()
+* Can [GANs]() take us to the next level?
+
+
+<br><br><br><br><br><br>
+This was built with [Quarto](https://quarto.org/)

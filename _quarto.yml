@@ -1,0 +1,19 @@
+project:
+  type: website
+
+website:
+  title: "Generally Generative"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+
+format: 
+  html:
+    code-fold: true
+    theme:
+          light: flatly
+          dark: darkly
+    toc: true
+
