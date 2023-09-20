@@ -63,6 +63,19 @@ def get_dls(train_df=None, valid_df=None, bs=64):
         valid_df = get_mnist_df(train=False)
     train_ds = ImageDataset(train_df)
     valid_ds = ImageDataset(valid_df)
-    train_dl = DataLoader(train_ds, batch_size=bs, shuffle=True, num_workers=8)
-    valid_dl = DataLoader(valid_ds, batch_size=bs*2, shuffle=False, num_workers=8)
+    train_dl = DataLoader(train_ds, batch_size=bs, shuffle=True, num_workers=8, pin_memory=True)
+    valid_dl = DataLoader(valid_ds, batch_size=bs*2, shuffle=False, num_workers=8, pin_memory=True)
     return train_dl, valid_dl
+
+
+def get_data(pct_data=1.0):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    train_df = get_mnist_df()
+    idxs = np.arange(len(train_df))
+    np.random.shuffle(idxs)
+    train_df = train_df.iloc[idxs[:int(len(idxs)*pct_data)]].reset_index(drop=True)
+    valid_df = get_mnist_df(train=False)
+    train_dl, valid_dl = get_dls(train_df, valid_df, bs=64)
+    dls = DataLoaders(train_dl, valid_dl)
+    dls = dls.to(device)
+    return dls, train_df, valid_df

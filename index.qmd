@@ -3,8 +3,8 @@ title: "Exploring the world of generative modeling"
 ---
 
 * First we'll start off with a something simple [Autoencoder](autoencoder.ipynb)
-    + An exploration on dataset requirements -- [How much data do we need?!]()
-* We'll then we'll make it even more robust: [Variational Autoencoders]()
+* We'll then we'll make it even more robust: [Variational Autoencoders](vae.ipynb)
+    + A brief foray to better understand the dataset requirements -- [How much data do we need?!](how_much_data.ipynb)
 * Can [GANs]() take us to the next level?
 
 
