@@ -23,7 +23,11 @@ def plot_dataset(df, num_samples=6):
 def get_valid_results(model, dl, num_samples=8):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     batch = next(iter(dl))
-    output = model(batch[0].to(device)).detach().cpu()
+    if get_model_type(model): #if it's a VAE, diff fwd pass
+        output, _, _ = model(batch[0].to(device))
+        output = output.detach().cpu()
+    else:
+        output = model(batch[0].to(device)).detach().cpu()
     return batch[0][:num_samples].cpu(), output[:num_samples]
 
 
@@ -58,15 +62,28 @@ def get_regen(model, x=2, y=20):
     
 
 def get_embeds(model, dl):
-    embeds = [model.encode(batch[0]) for batch in dl]
+    vae = get_model_type(model)
+    if vae:
+        embeds = [model.sampler(*model.encode(batch[0].to('cpu'))) for batch in dl]
+    else:
+        embeds = [model.encode(batch[0]) for batch in dl]
     embeds = torch.vstack(embeds[:-1]).detach().numpy()
     lbls = [batch[1] for batch in dl]
     lbls = np.hstack([np.array(x).astype('int') for x in lbls[:-1]])
     return embeds, lbls
 
 
-def get_encoded(model, train_df=False, shuffle=True):
-    dl = get_dl(train=train_df, bs=512, shuffle=True, num_workers=8)
+def get_model_type(model):
+    try: 
+        model.__getattr__('sampler')
+        vae_model = True
+    except AttributeError:
+        vae_model=False
+    return vae_model
+
+
+def get_encoded(model, train=False, shuffle=True):
+    dl = get_dl(train=train, bs=512, shuffle=True, num_workers=8)
     embeds, lbls = get_embeds(model, dl)
     return embeds, lbls
 

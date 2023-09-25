@@ -79,9 +79,9 @@ class Decoder(torch.nn.Module):
 class Autoencoder(torch.nn.Module): 
     def __init__(self):
         super(Autoencoder, self).__init__()
-        self.encoder = Encoder()#get_encoder()
+        self.encoder = Encoder()
         self.lin = torch.nn.Linear(2048, 2)
-        self.decoder = Decoder()#get_decoder()
+        self.decoder = Decoder()
     
     def forward(self, x):
         x = self.encode(x)
@@ -96,3 +96,69 @@ class Autoencoder(torch.nn.Module):
     def decode(self, x):
         x = self.decoder(x)
         return x
+    
+
+class Vae(torch.nn.Module): 
+    def __init__(self):
+        super(Vae, self).__init__()
+        self.encoder = Encoder()
+        self.mean_lin = torch.nn.Linear(2048, 2)
+        self.var_lin = torch.nn.Linear(2048, 2)
+        self.sampler = VaeSampler()
+        self.decoder = Decoder()
+    
+    def forward(self, x):
+        z_mean, z_var = self.encode(x)
+        z = self.sampler(z_mean, z_var)
+        reconstruction = self.decoder(z)
+        return reconstruction, z_mean, z_var
+    
+    
+    def encode(self, x):
+        x = self.encoder(x)
+        #pdb.set_trace()
+        z_mean = self.mean_lin(x)
+        z_var = self.var_lin(x)
+        return z_mean, z_var
+    
+    def decode(self, x):
+        x = self.decoder(x)
+        return x
+    
+    def generate(self, x):
+        return self.decoder(self.sampler(*self.encode(x)))
+    
+    
+class VaeSampler(torch.nn.Module):
+    def __init__(self):
+        super(VaeSampler, self).__init__()
+    
+    def forward(self, z_mean, z_var):
+        device = 'cuda' if z_mean.device.type == 'cuda' else 'cpu'
+        epsilon = torch.normal(mean=torch.tensor(0.0),
+                               std=torch.tensor(1.0),
+                               size=(z_mean.shape[0],
+                                     z_mean.shape[1])).to(device)
+        z = z_mean + torch.exp(0.5 * z_var.float()) * epsilon
+        return z
+    
+    
+class FeatureLoss(Module):
+    def __init__(self, cross_entropy=True):
+        if cross_entropy: self.recon_loss = torch.nn.BCEWithLogitsLoss()
+        else: self.recon_loss = torch.nn.MSELoss()
+        self.kl_loss = KlLoss()
+
+    def forward(self, preds, ys):
+        reconstruction, z_mean, z_var = preds
+        reconstruction_loss = self.recon_loss(reconstruction, ys)
+        kl_loss = self.kl_loss(z_mean, z_var)
+        total_loss = reconstruction_loss + kl_loss / 64
+        return total_loss
+
+    
+class KlLoss(Module):
+    def __init__(self):
+        pass
+    def forward(self, z_mean, z_var):
+        return torch.sum(-0.5 * (1 + z_var - z_mean**2 - torch.exp(z_var)))
