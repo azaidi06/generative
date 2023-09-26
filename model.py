@@ -40,10 +40,11 @@ class Encoder(torch.nn.Module):
     
     
 class Decoder(torch.nn.Module):
-    def __init__(self, conv_channels=[128,64,28,1]):
+    def __init__(self, conv_channels=[128,64,28,1], in_dims=2):
         super(Decoder, self).__init__()
         self.int_conv_layers = conv_channels
-        self.linear = torch.nn.Linear(2, 2048)
+        self.in_dims = in_dims
+        self.linear = torch.nn.Linear(in_dims, 2048)
         self.act = torch.nn.ReLU()
         self.unflatten = torch.nn.Unflatten(1, (128, 4, 4))
         self.conv_body = self.get_conv_layers()
@@ -99,13 +100,18 @@ class Autoencoder(torch.nn.Module):
     
 
 class Vae(torch.nn.Module): 
-    def __init__(self):
+    def __init__(self, latent_dims=2):
         super(Vae, self).__init__()
+        self.latent_dims = latent_dims 
         self.encoder = Encoder()
-        self.mean_lin = torch.nn.Linear(2048, 2)
-        self.var_lin = torch.nn.Linear(2048, 2)
+        self.mean_lin = torch.nn.Linear(2048, self.latent_dims)
+        self.var_lin = torch.nn.Linear(2048, self.latent_dims
+                                      
+                                      
+                                      
+                                      )
         self.sampler = VaeSampler()
-        self.decoder = Decoder()
+        self.decoder = Decoder(in_dims=self.latent_dims)
     
     def forward(self, x):
         z_mean, z_var = self.encode(x)

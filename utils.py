@@ -57,8 +57,11 @@ def get_random_latent_vals(min=-30, max=30, rows=6, cols=2):
     return min + (max - min) * np.random.rand(rows, cols)
 
 
-def get_regen(model, x=2, y=20):
-    return model.decode(torch.tensor([x,y]).float().unsqueeze(0))
+#def get_regen(model, x=2, y=20):
+#    return model.decode(torch.tensor([x,y]).float().unsqueeze(0))
+
+def get_regen(model, x):
+    return model.decode(torch.tensor(x).float().unsqueeze(0))
     
 
 def get_embeds(model, dl):
@@ -91,15 +94,17 @@ def get_encoded(model, train=False, shuffle=True):
 def get_decoded(model, latents=None, min=-30, max=30, rows=3, cols=2):
     if latents is None: 
         latents = get_random_latent_vals(min=min, max=max, rows=rows, cols=cols)
-    imgs = torch.stack([get_regen(model, *pt).squeeze(0) for pt in latents])
+    #imgs = torch.stack([get_regen(model, *pt).squeeze(0) for pt in latents])
+    imgs = torch.stack([get_regen(model, pt) for pt in latents])
     return imgs, latents
 
 
 def plot_latent_regen(model, latents=None, min=-30, max=30):
     model.to('cpu');
+    cols = model.decoder.linear.in_features
     # lets get our necessary items
     embeds, lbls = get_encoded(model)
-    regens, latents = get_decoded(model, latents=latents, min=min, max=max)
+    regens, latents = get_decoded(model, latents=latents, min=min, max=max, cols=cols)
 
     fig = plt.figure(figsize=(12, 6))
     
@@ -120,7 +125,7 @@ def plot_latent_regen(model, latents=None, min=-30, max=30):
     for i in range(3):
         ax = fig.add_subplot(3, 2, 2*i + 2)
         ax.imshow(regens[i].detach().numpy().squeeze())
-        ax.set_title([f'{x:.2f}' for x in latents[i]], fontdict={'fontsize':12})
+        ax.set_title([f'{x:.2f}' for x in latents[i][:2]], fontdict={'fontsize':12})
         ax.axis('off')
 
     plt.tight_layout()
