@@ -81,8 +81,8 @@ class Autoencoder(torch.nn.Module):
     def __init__(self):
         super(Autoencoder, self).__init__()
         self.encoder = Encoder()
-        self.lin = torch.nn.Linear(2048, 2)
-        self.decoder = Decoder()
+        self.lin = torch.nn.Linear(2048, 3)
+        self.decoder = Decoder(in_dims=3)
     
     def forward(self, x):
         x = self.encode(x)
@@ -105,11 +105,7 @@ class Vae(torch.nn.Module):
         self.latent_dims = latent_dims 
         self.encoder = Encoder()
         self.mean_lin = torch.nn.Linear(2048, self.latent_dims)
-        self.var_lin = torch.nn.Linear(2048, self.latent_dims
-                                      
-                                      
-                                      
-                                      )
+        self.var_lin = torch.nn.Linear(2048, self.latent_dims)
         self.sampler = VaeSampler()
         self.decoder = Decoder(in_dims=self.latent_dims)
     
@@ -159,7 +155,7 @@ class FeatureLoss(Module):
         reconstruction, z_mean, z_var = preds
         reconstruction_loss = self.recon_loss(reconstruction, ys)
         kl_loss = self.kl_loss(z_mean, z_var)
-        total_loss = reconstruction_loss + kl_loss / 64
+        total_loss = reconstruction_loss + kl_loss
         return total_loss
 
     

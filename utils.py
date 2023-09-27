@@ -99,7 +99,7 @@ def get_decoded(model, latents=None, min=-30, max=30, rows=3, cols=2):
     return imgs, latents
 
 
-def plot_latent_regen(model, latents=None, min=-30, max=30):
+def plot_2d_latent_regen(model, latents=None, min=-30, max=30):
     model.to('cpu');
     cols = model.decoder.linear.in_features
     # lets get our necessary items
@@ -113,7 +113,7 @@ def plot_latent_regen(model, latents=None, min=-30, max=30):
 
     # Create the scatter plot on the left
     ax0 = fig.add_subplot(gs[0])
-    sc = ax0.scatter(embeds[:, 0], embeds[:, 1], c=lbls, s=3, cmap='rainbow')
+    sc = ax0.scatter(embeds[:, 0], embeds[:, 1],c=lbls, s=3, cmap='rainbow')
     ax0.set_title("Latents/Embeddings")
     cbar = plt.colorbar(sc, ax=ax0)
     
@@ -130,3 +130,33 @@ def plot_latent_regen(model, latents=None, min=-30, max=30):
 
     plt.tight_layout()
     plt.show()
+    
+    
+def plot_latent_regen(model, latents=None, min=-3, max=3):
+    model.to('cpu');
+    cols = model.decoder.linear.in_features
+    # lets get our necessary items
+    embeds, lbls = get_encoded(model)
+    regens, latents = get_decoded(model, latents=latents, min=min, max=max, cols=3)
+
+    fig = plt.figure(figsize=(12, 6))
+
+    # Define the GridSpec layout
+    gs = GridSpec(1, 2, width_ratios=[1.25, 1])
+
+        # Create the scatter plot on the left
+    ax0 = fig.add_subplot(gs[0], projection='3d')
+    sc = ax0.scatter(embeds[:, 0], embeds[:, 1], embeds[:, 2] ,c=lbls, s=0.2, cmap='rainbow', zorder=1)
+    ax0.set_title("Latents/Embeddings")
+    cbar = plt.colorbar(sc, ax=ax0)
+
+    #background black marker (bigger) and then white one -- for better contrast
+    ax0.scatter(latents[:,0], latents[:,1], latents[:,2], marker='x', s=200, linewidths=8, color='red', zorder=2)
+    ax0.scatter(latents[:,0], latents[:,1], latents[:,2],  marker='x', s=200, linewidths=5.5, color='white', zorder=2)
+
+    # Create three smaller subplots on the right
+    for i in range(3):
+        ax = fig.add_subplot(3, 2, 2*i + 2)
+        ax.imshow(regens[i].detach().numpy().squeeze())
+        ax.set_title([f'{x:.2f}' for x in latents[i][:3]], fontdict={'fontsize':12})
+        ax.axis('off')
