@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Generally Generative - Exploring the world of generative modeling</title>
+<title>Generally Generative - Variational Autoencoders</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -61,6 +95,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -83,7 +120,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="./index.html" rel="" target="">
  <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
@@ -103,14 +140,25 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link active" data-scroll-target="#dataset">Dataset</a></li>
+  <li><a href="#reconstructed-images" id="toc-reconstructed-images" class="nav-link" data-scroll-target="#reconstructed-images">Reconstructed Images</a>
+  <ul class="collapse">
+  <li><a href="#still-pretty-good-but-we-were-more-interested-in-being-able-to-sample-from-the-embedding-space" id="toc-still-pretty-good-but-we-were-more-interested-in-being-able-to-sample-from-the-embedding-space" class="nav-link" data-scroll-target="#still-pretty-good-but-we-were-more-interested-in-being-able-to-sample-from-the-embedding-space">Still pretty good, but we were more interested in being able to sample from the embedding space!</a></li>
+  </ul></li>
+  <li><a href="#latent-space-exploration" id="toc-latent-space-exploration" class="nav-link" data-scroll-target="#latent-space-exploration">Latent space exploration</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Exploring the world of generative modeling</h1>
+<h1 class="title">Variational Autoencoders</h1>
 </div>
 
 
@@ -126,15 +174,219 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 <ul>
-<li>First we’ll start off with a something simple <a href="./autoencoder.html">Autoencoder</a></li>
-<li>We’ll then we’ll make it even more robust: <a href="./vae.html">Variational Autoencoders</a>
+<li>Autoencoders are pretty neat, but can we improve our models ability to understand the multi-dimensional space of our data?
 <ul>
-<li>A brief foray to better understand the dataset requirements – <a href="./how_much_data.html">How much data do we need?!</a></li>
+<li>In this notebook we’ll play with <code>variational autoencoders</code> to get a better feel for how they work and understand how they improve upon our vanilla autoencoder</li>
+<li>We’ll add some dimensions to our embedding space and see how we can sample from that differently from our normal autoencoder</li>
+<li>Add explanation of VAE(!)********</li>
 </ul></li>
 </ul>
-<p><br><br><br><br><br><br> This was built with <a href="https://quarto.org/">Quarto</a> `</p>
+<section id="dataset" class="level2">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<ul>
+<li>Our dataset is MNIST
+<ul>
+<li>A selection of ~70,000 handwritten digits – a few sampels can be seen below:</li>
+</ul></li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>plot_dataset(train_df, num_samples<span class="op">=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="vae_files/figure-html/cell-5-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">##| echo: false</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">##| output: false</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>learner.fine_tune(<span class="dv">12</span>, <span class="fl">3e-2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>5517.600586</td>
+<td>5498.638184</td>
+<td>00:09</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-display">
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+</div>
+<div class="cell-output cell-output-display">
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">epoch</th>
+<th data-quarto-table-cell-role="th">train_loss</th>
+<th data-quarto-table-cell-role="th">valid_loss</th>
+<th data-quarto-table-cell-role="th">time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>4891.000488</td>
+<td>5152.509766</td>
+<td>00:09</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>4193.120605</td>
+<td>4459.402344</td>
+<td>00:09</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>3492.046143</td>
+<td>3789.639160</td>
+<td>00:09</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>2972.184326</td>
+<td>inf</td>
+<td>00:09</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>2806.825684</td>
+<td>3257.438721</td>
+<td>00:09</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>2768.563477</td>
+<td>9286.187500</td>
+<td>00:09</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>2725.435791</td>
+<td>3127.360596</td>
+<td>00:09</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>2669.043701</td>
+<td>3085.611572</td>
+<td>00:09</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>2644.336670</td>
+<td>3081.457764</td>
+<td>00:09</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>2591.880371</td>
+<td>3039.255615</td>
+<td>00:09</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>2564.253906</td>
+<td>3029.602295</td>
+<td>00:09</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>2568.311523</td>
+<td>3029.368896</td>
+<td>00:09</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="reconstructed-images" class="level2">
+<h2 class="anchored" data-anchor-id="reconstructed-images">Reconstructed Images</h2>
+<div class="cell">
+<div class="cell-output cell-output-display">
+<p><img src="vae_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<section id="still-pretty-good-but-we-were-more-interested-in-being-able-to-sample-from-the-embedding-space" class="level3">
+<h3 class="anchored" data-anchor-id="still-pretty-good-but-we-were-more-interested-in-being-able-to-sample-from-the-embedding-space">Still pretty good, but we were more interested in being able to sample from the embedding space!</h3>
+</section>
+</section>
+<section id="latent-space-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="latent-space-exploration">Latent space exploration</h2>
+<ul>
+<li>Lets see how our validation set gets mapped into embedding space via our encoder
+<ul>
+<li>Reduced overlap because we can project into 3 dimensions</li>
+<li>Even for points outside the distribution that it’s already seen, it is able to map them into something meaningful</li>
+</ul></li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>plot_latent_regen(model, <span class="bu">min</span><span class="op">=-</span><span class="dv">4</span>, <span class="bu">max</span><span class="op">=</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="vae_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">left: embedding scatter plot <br> right: reconstructed latents</figcaption>
+</figure>
+</div>
+</div>
+<p>Figure 2: Embedding Space and Latent Reconstructions</p>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

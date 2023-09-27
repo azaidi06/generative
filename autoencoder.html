@@ -215,15 +215,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>learner.model.encoder</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
-<pre><code>Sequential(
-  (0): Conv2d(1, 28, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
-  (1): ReLU()
-  (2): Conv2d(28, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
-  (3): ReLU()
-  (4): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
-  (5): ReLU()
-  (6): Flatten(start_dim=1, end_dim=-1)
-  (7): Linear(in_features=2048, out_features=2, bias=True)
+<pre><code>Encoder(
+  (conv_body): Sequential(
+    (0): Sequential(
+      (0): Conv2d(1, 28, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (1): ReLU()
+      (2): BatchNorm2d(28, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (1): Sequential(
+      (0): Conv2d(28, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (1): ReLU()
+      (2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (2): Sequential(
+      (0): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (1): ReLU()
+      (2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (3): Flatten(start_dim=1, end_dim=-1)
+  )
 )</code></pre>
 </div>
 </div>
@@ -235,7 +245,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>learner.fine_tune(<span class="dv">3</span>, <span class="fl">3e-2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>learner.fine_tune(<span class="dv">12</span>, <span class="fl">3e-2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 
@@ -268,9 +278,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>3331.510742</td>
-<td>3205.732666</td>
-<td>00:59</td>
+<td>5155.662598</td>
+<td>4945.959473</td>
+<td>00:11</td>
 </tr>
 </tbody>
 </table>
@@ -306,21 +316,75 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>3113.601562</td>
-<td>3133.075684</td>
-<td>00:59</td>
+<td>4468.581543</td>
+<td>4515.016602</td>
+<td>00:10</td>
 </tr>
 <tr class="even">
 <td>1</td>
-<td>2983.510010</td>
-<td>2938.452881</td>
-<td>00:59</td>
+<td>3757.476807</td>
+<td>3749.431152</td>
+<td>00:10</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>2805.703369</td>
-<td>2815.310547</td>
-<td>00:59</td>
+<td>2952.762695</td>
+<td>2943.328125</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>2412.282959</td>
+<td>2392.489746</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>2201.123535</td>
+<td>2181.014648</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>2136.700684</td>
+<td>2128.168701</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>2079.706299</td>
+<td>2101.125488</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>2062.214600</td>
+<td>2058.276123</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>2040.573120</td>
+<td>2023.409058</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>1962.690796</td>
+<td>1995.426025</td>
+<td>00:10</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>1921.806641</td>
+<td>1983.867798</td>
+<td>00:10</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>1950.791992</td>
+<td>1979.757446</td>
+<td>00:10</td>
 </tr>
 </tbody>
 </table>
@@ -347,7 +411,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>plot_latent_regen(learner.model, <span class="bu">min</span><span class="op">=-</span><span class="dv">100</span>, <span class="bu">max</span><span class="op">=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>plot_2d_latent_regen(learner.model, <span class="bu">min</span><span class="op">=-</span><span class="dv">200</span>, <span class="bu">max</span><span class="op">=</span><span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">

@@ -2,18 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://azaidi06.github.io/generative/about.html</loc>
-    <lastmod>2023-09-18T22:54:31.320Z</lastmod>
+    <lastmod>2023-09-27T02:12:13.958Z</lastmod>
   </url>
   <url>
-    <loc>https://azaidi06.github.io/generative/init_autoencoder.html</loc>
-    <lastmod>2023-09-18T22:54:30.855Z</lastmod>
+    <loc>https://azaidi06.github.io/generative/vae.html</loc>
+    <lastmod>2023-09-27T02:12:13.524Z</lastmod>
+  </url>
+  <url>
+    <loc>https://azaidi06.github.io/generative/how_much_data.html</loc>
+    <lastmod>2023-09-27T02:12:12.758Z</lastmod>
   </url>
   <url>
     <loc>https://azaidi06.github.io/generative/autoencoder.html</loc>
-    <lastmod>2023-09-18T22:54:30.378Z</lastmod>
+    <lastmod>2023-09-27T02:12:12.427Z</lastmod>
+  </url>
+  <url>
+    <loc>https://azaidi06.github.io/generative/init_autoencoder.html</loc>
+    <lastmod>2023-09-27T02:12:13.206Z</lastmod>
   </url>
   <url>
     <loc>https://azaidi06.github.io/generative/index.html</loc>
-    <lastmod>2023-09-18T22:54:31.094Z</lastmod>
+    <lastmod>2023-09-27T02:12:13.742Z</lastmod>
   </url>
 </urlset>
