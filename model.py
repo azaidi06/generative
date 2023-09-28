@@ -164,3 +164,6 @@ class KlLoss(Module):
         pass
     def forward(self, z_mean, z_var):
         return torch.sum(-0.5 * (1 + z_var - z_mean**2 - torch.exp(z_var)))
+    
+    
+    
